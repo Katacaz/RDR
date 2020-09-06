@@ -81,4 +81,12 @@ public class CameraController : MonoBehaviour
         //transform.position = target.transform.position - offset;
         transform.LookAt(target.transform.position);
     }
+
+    public void ChangeTarget(GameObject t)
+    {
+        pivot.position = t.transform.position;
+        pivot.parent = t.transform;
+
+        target = t;
+    }
 }

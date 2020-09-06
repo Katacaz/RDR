@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
-    //private Rigidbody rB;
+    private Rigidbody rB;
 
     public float jumpForce = 5.0f;
 
@@ -22,32 +22,48 @@ public class PlayerController : MonoBehaviour
     public float jumpChargeMax;
     float flattenScale = 0.5f;
 
+    GameManager gameManager;
+
+    public float knockBackForce;
+    public float knockBackTime;
+    private float knockBackCounter;
+    public bool isKnockBack;
+
+
+    public float maxSpeed = 20f;
+    public float timeZeroToMax = 2.5f;
+    private float accelRatePerSec;
+    public float forwardVelocity;
+    public float horizontalVelocity;
+    public float maxHorizontalSpeed = 5f;
+    public float maxReverseSpeed = 5f;
+    public KeyCode forwardKey;
+    public KeyCode leftKey;
+    public KeyCode rightKey;
+    public KeyCode backKey;
+
     // Start is called before the first frame update
     void Start()
     {
-        //rB = GetComponent<Rigidbody>();
+        accelRatePerSec = maxSpeed / timeZeroToMax;
+        forwardVelocity = 0f;
+        gameManager = GameObject.FindObjectOfType<GameManager>();
         controller = GetComponent<CharacterController>();
+        rB = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        //if (!jumpCharging)
-        //{
-        //moveDirection = new Vector3(Input.GetAxis("Horizontal") * moveSpeed, moveDirection.y, Input.GetAxis("Vertical") * moveSpeed);
-        //} else
-        //{
-        //    moveDirection = Vector3.zero;
-        //}
-        float yStore = moveDirection.y;
+        /*float yStore = moveDirection.y;
         if (controller.isGrounded)
         {
-            moveDirection = (transform.forward * Input.GetAxisRaw("Vertical")) + (transform.right * Input.GetAxisRaw("Horizontal"));
+            moveDirection = (transform.forward * Input.GetAxisRaw("P1 Vertical")) + (transform.right * Input.GetAxisRaw("P1 Horizontal"));
             moveDirection = moveDirection.normalized * moveSpeed;
-        } else
+        }
+        else
         {
-            moveDirection = (transform.forward * Input.GetAxis("Vertical")) + (transform.right * Input.GetAxis("Horizontal"));
+            moveDirection = (transform.forward * Input.GetAxis("P1 Vertical")) + (transform.right * Input.GetAxis("P1 Horizontal"));
             moveDirection = moveDirection.normalized * moveSpeed;
         }
         moveDirection.y = yStore;
@@ -73,7 +89,8 @@ public class PlayerController : MonoBehaviour
                 moveDirection.y = jumpChargeAmount;
                 jumpChargeAmount = 0f;
                 transform.localScale = new Vector3(1f, 1f, 1f);
-            } else
+            }
+            else
             {
                 if (jumpChargeAmount < jumpChargeMax)
                 {
@@ -87,7 +104,71 @@ public class PlayerController : MonoBehaviour
         }
         moveDirection.y = moveDirection.y + (Physics.gravity.y * fallScale * Time.deltaTime);
         controller.Move(moveDirection * Time.deltaTime);
+        */
+
+        if (Input.GetKey(forwardKey) || Input.GetKey(backKey))
+        {
+            if (Input.GetKey(forwardKey))
+            {
+                forwardVelocity += accelRatePerSec * Time.deltaTime;
+                forwardVelocity = Mathf.Min(forwardVelocity, maxSpeed);
+            }
+            if (Input.GetKey(backKey))
+            {
+                forwardVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                forwardVelocity = Mathf.Min(forwardVelocity, maxReverseSpeed);
+            }
+        } else
+        {
+            if (forwardVelocity > 0)
+            {
+                forwardVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                forwardVelocity = Mathf.Max(forwardVelocity, 0f);
+            }
+            if (forwardVelocity < 0)
+            {
+                forwardVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                forwardVelocity = Mathf.Min(forwardVelocity, 0f);
+            }
+        }
 
 
+        if (Input.GetKey(leftKey) || Input.GetKey(rightKey))
+        {
+            if (Input.GetKey(leftKey)) {
+                horizontalVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                horizontalVelocity = Mathf.Min(horizontalVelocity, -maxHorizontalSpeed);
+            }
+            if (Input.GetKey(rightKey))
+            {
+                horizontalVelocity += accelRatePerSec * Time.deltaTime / 2f;
+                horizontalVelocity = Mathf.Max(horizontalVelocity, maxHorizontalSpeed);
+            }
+
+        }
+        else
+        {
+            if (horizontalVelocity > 0)
+            {
+                horizontalVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                horizontalVelocity = Mathf.Max(horizontalVelocity, 0f);
+            }
+            if (horizontalVelocity < 0)
+            {
+                horizontalVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                horizontalVelocity = Mathf.Min(horizontalVelocity, 0f);
+            }
+        }
+        rB.velocity = ((transform.forward * forwardVelocity) + (transform.right * horizontalVelocity));
+        rB.velocity -= (Vector3.up * fallScale * Time.deltaTime);
+        rB.angularVelocity = Vector3.zero;
+        //Debug.Log("The Player Rigidbody Velocity is: " + rB.velocity);
+    }
+
+    public void KnockBack(Vector3 direction)
+    {
+        knockBackCounter = knockBackTime;
+
+        moveDirection = direction * knockBackForce;
     }
 }
