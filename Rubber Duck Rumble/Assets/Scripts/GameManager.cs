@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
 
     public KeyCode playerSwapKey;
 
+    public Transform respawnPosition;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,10 +24,15 @@ public class GameManager : MonoBehaviour
     public void Player1LeftArea()
     {
         Debug.Log("Player 1 has left the play area.");
+        players[0].transform.position = respawnPosition.position;
+        players[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
+
     }
     public void Player2LeftArea()
     {
         Debug.Log("Player 2 has left the play area");
+        players[1].transform.position = respawnPosition.position;
+        players[1].GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
     // Update is called once per frame
     void Update()

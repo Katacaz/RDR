@@ -20,7 +20,7 @@ public class Player2Controller : MonoBehaviour
     public float jumpChargeScale = 1f;
     public float jumpChargeMin;
     public float jumpChargeMax;
-    float flattenScale = 0.5f;
+    //float flattenScale = 0.5f;
 
     GameManager gameManager;
 
@@ -41,6 +41,10 @@ public class Player2Controller : MonoBehaviour
     public KeyCode rightKey;
     public KeyCode backKey;
 
+    public bool isGrounded;
+    private float distanceToGround = 0.1f;
+    public GameObject groundCheck;
+    public LayerMask groundLayer;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,7 +54,6 @@ public class Player2Controller : MonoBehaviour
         gameManager = GameObject.FindObjectOfType<GameManager>();
         controller = GetComponent<CharacterController>();
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -112,70 +115,91 @@ public class Player2Controller : MonoBehaviour
         moveDirection.y = moveDirection.y + (Physics.gravity.y * fallScale * Time.deltaTime);
         //controller.Move(moveDirection * Time.deltaTime);
         */
-        if (Input.GetKey(forwardKey) || Input.GetKey(backKey))
+        isGrounded = Physics.CheckSphere(groundCheck.transform.position, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);
+        if (knockBackCounter <= 0)
         {
-            if (Input.GetKey(forwardKey))
+            isKnockBack = false;
+            if (Input.GetKey(forwardKey) || Input.GetKey(backKey))
             {
-                forwardVelocity += accelRatePerSec * Time.deltaTime;
-                forwardVelocity = Mathf.Min(forwardVelocity, maxSpeed);
+                if (Input.GetKey(forwardKey))
+                {
+                    forwardVelocity += accelRatePerSec * Time.deltaTime;
+                    forwardVelocity = Mathf.Min(forwardVelocity, maxSpeed);
+                }
+                if (Input.GetKey(backKey))
+                {
+                    forwardVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                    forwardVelocity = Mathf.Min(forwardVelocity, maxReverseSpeed);
+                }
             }
-            if (Input.GetKey(backKey))
+            else
             {
-                forwardVelocity -= accelRatePerSec * Time.deltaTime / 2f;
-                forwardVelocity = Mathf.Min(forwardVelocity, maxReverseSpeed);
+                if (forwardVelocity > 0)
+                {
+                    forwardVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                    forwardVelocity = Mathf.Max(forwardVelocity, 0f);
+                }
+                if (forwardVelocity < 0)
+                {
+                    forwardVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                    forwardVelocity = Mathf.Min(forwardVelocity, 0f);
+                }
             }
-        }
-        else
-        {
-            if (forwardVelocity > 0)
-            {
-                forwardVelocity -= accelRatePerSec * Time.deltaTime * 2f;
-                forwardVelocity = Mathf.Max(forwardVelocity, 0f);
-            }
-            if (forwardVelocity < 0)
-            {
-                forwardVelocity += accelRatePerSec * Time.deltaTime * 2f;
-                forwardVelocity = Mathf.Min(forwardVelocity, 0f);
-            }
-        }
 
 
-        if (Input.GetKey(leftKey) || Input.GetKey(rightKey))
-        {
-            if (Input.GetKey(leftKey))
+            if (Input.GetKey(leftKey) || Input.GetKey(rightKey))
             {
-                horizontalVelocity -= accelRatePerSec * Time.deltaTime / 2f;
-                horizontalVelocity = Mathf.Min(horizontalVelocity, -maxHorizontalSpeed);
-            }
-            if (Input.GetKey(rightKey))
-            {
-                horizontalVelocity += accelRatePerSec * Time.deltaTime / 2f;
-                horizontalVelocity = Mathf.Max(horizontalVelocity, maxHorizontalSpeed);
-            }
+                if (Input.GetKey(leftKey))
+                {
+                    horizontalVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                    horizontalVelocity = Mathf.Min(horizontalVelocity, -maxHorizontalSpeed);
+                }
+                if (Input.GetKey(rightKey))
+                {
+                    horizontalVelocity += accelRatePerSec * Time.deltaTime / 2f;
+                    horizontalVelocity = Mathf.Max(horizontalVelocity, maxHorizontalSpeed);
+                }
 
-        }
-        else
+            }
+            else
+            {
+                if (horizontalVelocity > 0)
+                {
+                    horizontalVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                    horizontalVelocity = Mathf.Max(horizontalVelocity, 0f);
+                }
+                if (horizontalVelocity < 0)
+                {
+                    horizontalVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                    horizontalVelocity = Mathf.Min(horizontalVelocity, 0f);
+                }
+            }
+            rB.velocity = (transform.forward * forwardVelocity) + (transform.right * horizontalVelocity);
+            if (!isGrounded)
+            {
+                rB.velocity -= (Vector3.up * fallScale);
+            }
+            rB.angularVelocity = Vector3.zero;
+        } else
         {
-            if (horizontalVelocity > 0)
-            {
-                horizontalVelocity -= accelRatePerSec * Time.deltaTime * 2f;
-                horizontalVelocity = Mathf.Max(horizontalVelocity, 0f);
-            }
-            if (horizontalVelocity < 0)
-            {
-                horizontalVelocity += accelRatePerSec * Time.deltaTime * 2f;
-                horizontalVelocity = Mathf.Min(horizontalVelocity, 0f);
-            }
+            knockBackCounter -= Time.deltaTime;
+            isKnockBack = true;
         }
-        rB.velocity = (transform.forward * forwardVelocity) + (transform.right * horizontalVelocity);
-        rB.angularVelocity = Vector3.zero;
+        
 
     }
 
-    public void KnockBack(Vector3 direction)
+    public void KnockBack()
     {
-        knockBackCounter = knockBackTime;
+        Debug.Log("Player 2 Knocked Back");
+        KnockBackObject knockBack = GetComponent<KnockBackObject>();
 
-        moveDirection = direction * knockBackForce;
+        knockBackCounter = knockBackTime;
+        forwardVelocity = 0f;
+        horizontalVelocity = 0f;
+        rB.AddForce((-(knockBack.knockBackDirection * knockBack.knockbackAmount)) + (Vector3.up * knockBack.knockbackAmount * 0.2f), ForceMode.VelocityChange);
+
+
     }
+
 }

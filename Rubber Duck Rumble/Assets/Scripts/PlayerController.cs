@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public float jumpChargeScale = 1f;
     public float jumpChargeMin;
     public float jumpChargeMax;
-    float flattenScale = 0.5f;
+    //float flattenScale = 0.5f;
 
     GameManager gameManager;
 
@@ -42,6 +42,11 @@ public class PlayerController : MonoBehaviour
     public KeyCode rightKey;
     public KeyCode backKey;
 
+    public bool isGrounded;
+    public GameObject groundCheck;
+    float distanceToGround = 0.1f;
+
+    public LayerMask groundLayer;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,124 +56,94 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         rB = GetComponent<Rigidbody>();
     }
-
     // Update is called once per frame
     void Update()
     {
-        /*float yStore = moveDirection.y;
-        if (controller.isGrounded)
+
+        isGrounded = Physics.CheckSphere(groundCheck.transform.position, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);
+        if (knockBackCounter <= 0)
         {
-            moveDirection = (transform.forward * Input.GetAxisRaw("P1 Vertical")) + (transform.right * Input.GetAxisRaw("P1 Horizontal"));
-            moveDirection = moveDirection.normalized * moveSpeed;
-        }
-        else
-        {
-            moveDirection = (transform.forward * Input.GetAxis("P1 Vertical")) + (transform.right * Input.GetAxis("P1 Horizontal"));
-            moveDirection = moveDirection.normalized * moveSpeed;
-        }
-        moveDirection.y = yStore;
-        if (controller.isGrounded)
-        {
-            moveDirection.y = 0f;
-            if (Input.GetButton("Jump"))
+            isKnockBack = false;
+            if (Input.GetKey(forwardKey) || Input.GetKey(backKey))
             {
-                if (!jumpCharging)
+                if (Input.GetKey(forwardKey))
                 {
-                    jumpChargeAmount = jumpChargeMin;
+                    forwardVelocity += accelRatePerSec * Time.deltaTime;
+                    forwardVelocity = Mathf.Min(forwardVelocity, maxSpeed);
                 }
-                jumpCharging = true;
-
-            }
-            if (!Input.GetButton("Jump"))
-            {
-                jumpCharging = false;
-            }
-
-            if (!jumpCharging)
-            {
-                moveDirection.y = jumpChargeAmount;
-                jumpChargeAmount = 0f;
-                transform.localScale = new Vector3(1f, 1f, 1f);
+                if (Input.GetKey(backKey))
+                {
+                    forwardVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                    forwardVelocity = Mathf.Min(forwardVelocity, maxReverseSpeed);
+                }
             }
             else
             {
-                if (jumpChargeAmount < jumpChargeMax)
+                if (forwardVelocity > 0)
                 {
-                    jumpChargeAmount += jumpChargeScale * Time.deltaTime;
-                    if (transform.localScale.y > 0.3f)
-                    {
-                        transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y - (flattenScale * Time.deltaTime), transform.localScale.z);
-                    }
+                    forwardVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                    forwardVelocity = Mathf.Max(forwardVelocity, 0f);
+                }
+                if (forwardVelocity < 0)
+                {
+                    forwardVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                    forwardVelocity = Mathf.Min(forwardVelocity, 0f);
                 }
             }
-        }
-        moveDirection.y = moveDirection.y + (Physics.gravity.y * fallScale * Time.deltaTime);
-        controller.Move(moveDirection * Time.deltaTime);
-        */
 
-        if (Input.GetKey(forwardKey) || Input.GetKey(backKey))
-        {
-            if (Input.GetKey(forwardKey))
+
+            if (Input.GetKey(leftKey) || Input.GetKey(rightKey))
             {
-                forwardVelocity += accelRatePerSec * Time.deltaTime;
-                forwardVelocity = Mathf.Min(forwardVelocity, maxSpeed);
+                if (Input.GetKey(leftKey))
+                {
+                    horizontalVelocity -= accelRatePerSec * Time.deltaTime / 2f;
+                    horizontalVelocity = Mathf.Min(horizontalVelocity, -maxHorizontalSpeed);
+                }
+                if (Input.GetKey(rightKey))
+                {
+                    horizontalVelocity += accelRatePerSec * Time.deltaTime / 2f;
+                    horizontalVelocity = Mathf.Max(horizontalVelocity, maxHorizontalSpeed);
+                }
+
             }
-            if (Input.GetKey(backKey))
+            else
             {
-                forwardVelocity -= accelRatePerSec * Time.deltaTime / 2f;
-                forwardVelocity = Mathf.Min(forwardVelocity, maxReverseSpeed);
+                if (horizontalVelocity > 0)
+                {
+                    horizontalVelocity -= accelRatePerSec * Time.deltaTime * 2f;
+                    horizontalVelocity = Mathf.Max(horizontalVelocity, 0f);
+                }
+                if (horizontalVelocity < 0)
+                {
+                    horizontalVelocity += accelRatePerSec * Time.deltaTime * 2f;
+                    horizontalVelocity = Mathf.Min(horizontalVelocity, 0f);
+                }
             }
+            rB.velocity = ((transform.forward * forwardVelocity) + (transform.right * horizontalVelocity));
+            if (!isGrounded)
+            {
+                rB.velocity -= (Vector3.up * fallScale);
+            }
+            rB.angularVelocity = Vector3.zero;
         } else
         {
-            if (forwardVelocity > 0)
-            {
-                forwardVelocity -= accelRatePerSec * Time.deltaTime * 2f;
-                forwardVelocity = Mathf.Max(forwardVelocity, 0f);
-            }
-            if (forwardVelocity < 0)
-            {
-                forwardVelocity += accelRatePerSec * Time.deltaTime * 2f;
-                forwardVelocity = Mathf.Min(forwardVelocity, 0f);
-            }
+            knockBackCounter -= Time.deltaTime;
+            isKnockBack = true;
         }
 
-
-        if (Input.GetKey(leftKey) || Input.GetKey(rightKey))
-        {
-            if (Input.GetKey(leftKey)) {
-                horizontalVelocity -= accelRatePerSec * Time.deltaTime / 2f;
-                horizontalVelocity = Mathf.Min(horizontalVelocity, -maxHorizontalSpeed);
-            }
-            if (Input.GetKey(rightKey))
-            {
-                horizontalVelocity += accelRatePerSec * Time.deltaTime / 2f;
-                horizontalVelocity = Mathf.Max(horizontalVelocity, maxHorizontalSpeed);
-            }
-
-        }
-        else
-        {
-            if (horizontalVelocity > 0)
-            {
-                horizontalVelocity -= accelRatePerSec * Time.deltaTime * 2f;
-                horizontalVelocity = Mathf.Max(horizontalVelocity, 0f);
-            }
-            if (horizontalVelocity < 0)
-            {
-                horizontalVelocity += accelRatePerSec * Time.deltaTime * 2f;
-                horizontalVelocity = Mathf.Min(horizontalVelocity, 0f);
-            }
-        }
-        rB.velocity = ((transform.forward * forwardVelocity) + (transform.right * horizontalVelocity));
-        rB.velocity -= (Vector3.up * fallScale * Time.deltaTime);
-        rB.angularVelocity = Vector3.zero;
         //Debug.Log("The Player Rigidbody Velocity is: " + rB.velocity);
     }
 
-    public void KnockBack(Vector3 direction)
+    public void KnockBack()
     {
-        knockBackCounter = knockBackTime;
+        Debug.Log("Player 1 Knocked Back");
+        KnockBackObject knockBack = GetComponent<KnockBackObject>();
 
-        moveDirection = direction * knockBackForce;
+        knockBackCounter = knockBackTime;
+        forwardVelocity = 0f;
+        horizontalVelocity = 0f;
+        rB.AddForce((-(knockBack.knockBackDirection * knockBack.knockbackAmount)) + (Vector3.up * knockBack.knockbackAmount * 0.2f), ForceMode.VelocityChange);
+
     }
+
 }

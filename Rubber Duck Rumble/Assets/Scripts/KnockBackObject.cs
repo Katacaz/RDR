@@ -6,6 +6,12 @@ public class KnockBackObject : MonoBehaviour
 {
     Rigidbody body;
 
+    public float knockbackMultiplier = 2f;
+
+    public bool responsibleForKnockback = true;
+
+    public Vector3 knockBackDirection;
+    public float knockbackAmount;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,32 +23,39 @@ public class KnockBackObject : MonoBehaviour
     {
         
     }
-
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.GetComponent<KnockBackObject>())
+        KnockBackObject kbo = collision.collider.GetComponent<KnockBackObject>();
+        if (kbo != null)
         {
-            if ((other.GetComponent<Rigidbody>().velocity.magnitude > this.body.velocity.magnitude))
+            Rigidbody rb = collision.collider.GetComponent<Rigidbody>();
+            if (rb != null)
             {
-                //If other object is faster
-                Vector3 hitDirection = (other.transform.position - transform.position).normalized;
-                KnockBack(hitDirection, other.GetComponent<Rigidbody>().velocity.magnitude);
+                //Debug.Log("Collision with object with Rigidbody");
+                if ((rb.velocity.magnitude > this.body.velocity.magnitude))
+                {
+                    //If other object is faster
+                    knockBackDirection = (rb.transform.position - transform.position).normalized;
+                    knockbackAmount = rb.velocity.magnitude * knockbackMultiplier;
+
+                    rb.velocity = rb.velocity / 2f;
+                    if (responsibleForKnockback)
+                    {
+                        Debug.Log(this.transform.name + " knocked Back");
+                        KnockBackThis(knockBackDirection, knockbackAmount);
+                    } else
+                    {
+                        SendMessage("KnockBack");
+                    }
+                }
             }
         }
     }
-    private void OnCollisionEnter(Collision collision)
-    {
-        Rigidbody rb = collision.collider.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            Debug.Log("Collision with object with Rigidbody");
-        }
-    }
 
-    public void KnockBack(Vector3 direction, float amount)
+    public void KnockBackThis(Vector3 direction, float amount)
     {
         Debug.Log("Object Knocked Back by: " + amount);
-        body.AddForce((-direction * amount * 2f) + (Vector3.up * amount * 0.1f), ForceMode.Impulse);
+        body.AddForce((-direction * amount) + (Vector3.up * amount * 0.1f), ForceMode.Impulse);
         
     }
 }
