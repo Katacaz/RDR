@@ -5104,6 +5104,7 @@ MonoBehaviour:
   responsibleForKnockback: 0
   knockBackDirection: {x: 0, y: 0, z: 0}
   knockbackAmount: 0
+  isPlayer: 1
 --- !u!1 &1922523001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5244,6 +5245,7 @@ MonoBehaviour:
   responsibleForKnockback: 0
   knockBackDirection: {x: 0, y: 0, z: 0}
   knockbackAmount: 0
+  isPlayer: 1
 --- !u!1 &1978834508
 GameObject:
   m_ObjectHideFlags: 0

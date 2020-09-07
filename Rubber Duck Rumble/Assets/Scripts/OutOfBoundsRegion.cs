@@ -28,5 +28,13 @@ public class OutOfBoundsRegion : MonoBehaviour
         {
             gameManager.Player2LeftArea();
         }
+        if (other.GetComponent<KnockBackObject>())
+        {
+
+            if (!other.GetComponent<KnockBackObject>().isPlayer)
+            {
+                Destroy(other.gameObject);
+            }
+        }
     }
 }

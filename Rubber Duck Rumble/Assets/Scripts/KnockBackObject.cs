@@ -12,6 +12,8 @@ public class KnockBackObject : MonoBehaviour
 
     public Vector3 knockBackDirection;
     public float knockbackAmount;
+
+    public bool isPlayer;
     // Start is called before the first frame update
     void Start()
     {
