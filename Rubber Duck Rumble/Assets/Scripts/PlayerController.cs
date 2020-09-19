@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
         rB = GetComponent<Rigidbody>();
     }
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
 
         isGrounded = Physics.CheckSphere(groundCheck.transform.position, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);

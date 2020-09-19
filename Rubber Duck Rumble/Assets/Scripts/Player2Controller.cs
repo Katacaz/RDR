@@ -55,7 +55,7 @@ public class Player2Controller : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         /*if (knockBackCounter <= 0)
         {

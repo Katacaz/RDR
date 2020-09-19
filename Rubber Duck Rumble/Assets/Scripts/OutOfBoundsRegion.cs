@@ -37,4 +37,25 @@ public class OutOfBoundsRegion : MonoBehaviour
             }
         }
     }
+    private void OnCollisionEnter(Collision collision)
+    {
+        Collider other = collision.collider;
+
+        if (other.GetComponent<PlayerController>())
+        {
+            gameManager.Player1LeftArea();
+        }
+        if (other.GetComponent<Player2Controller>())
+        {
+            gameManager.Player2LeftArea();
+        }
+        if (other.GetComponent<KnockBackObject>())
+        {
+
+            if (!other.GetComponent<KnockBackObject>().isPlayer)
+            {
+                Destroy(other.gameObject);
+            }
+        }
+    }
 }
