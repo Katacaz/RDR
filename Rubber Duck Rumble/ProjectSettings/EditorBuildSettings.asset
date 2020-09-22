@@ -4,5 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 8250c2678e5e8264eb8dba596be819f5
+  - enabled: 1
+    path: Assets/Scenes/SoloDeathmatch.unity
+    guid: fb32b005c164f3049a3fd8a2187b63a6
+  m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 7fec743d4f8e4ab4baf023f17872ec62, type: 2}

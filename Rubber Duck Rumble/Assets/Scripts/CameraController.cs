@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
+
+    public PlayerInput cameraInput;
     public GameObject target;
     public Transform pivot;
 
@@ -19,6 +21,16 @@ public class CameraController : MonoBehaviour
     public bool invertYAxis;
     public bool invertXAxis;
 
+    InputActions_Camera inputActions;
+
+    Vector2 movementInput;
+
+    private void Awake()
+    {
+        inputActions = new InputActions_Camera();
+        inputActions.CameraMovement.Movement.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+        
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -29,14 +41,15 @@ public class CameraController : MonoBehaviour
         pivot.position = target.transform.position;
         pivot.parent = target.transform;
 
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
         // Get the X position of the mouse & rotate target
-        float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
+        //float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
+        float horizontal = movementInput.x * rotateSpeed;
         if (invertXAxis)
         {
             target.transform.Rotate(0f, -horizontal, 0f);
@@ -46,7 +59,8 @@ public class CameraController : MonoBehaviour
         }
 
         //Get the Y position of the mouse & rotate the pivot
-        float vertical = Input.GetAxis("Mouse Y") * rotateSpeed;
+        float vertical = movementInput.y * rotateSpeed;
+        //float vertical = Input.GetAxis("Mouse Y") * rotateSpeed;
         if (invertYAxis)
         {
             pivot.Rotate(vertical, 0f, 0f);
@@ -88,5 +102,19 @@ public class CameraController : MonoBehaviour
         pivot.parent = t.transform;
 
         target = t;
+    }
+
+    void OnMovement(InputAction value)
+    {
+        //Vector2 inputMovement = value.Get<Vector2>();
+        //= new Vector3(inputMovement.x, 0, inputMovement.y);
+    }
+    private void OnEnable()
+    {
+        inputActions.Enable();
+    }
+    private void OnDisable()
+    {
+        inputActions.Disable();
     }
 }

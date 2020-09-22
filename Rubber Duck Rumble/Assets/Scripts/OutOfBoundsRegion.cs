@@ -6,6 +6,7 @@ public class OutOfBoundsRegion : MonoBehaviour
 {
     public GameManager gameManager;
 
+    public bool outOfBoundsArea;
     // Start is called before the first frame update
     void Start()
     {
@@ -36,12 +37,23 @@ public class OutOfBoundsRegion : MonoBehaviour
                 Destroy(other.gameObject);
             }
         }
+
     }
     private void OnCollisionEnter(Collision collision)
     {
         Collider other = collision.collider;
-
-        if (other.GetComponent<PlayerController>())
+        OutOfBoundsChecker checker = other.GetComponent<OutOfBoundsChecker>();
+        if (checker != null)
+        {
+            if (outOfBoundsArea)
+            {
+                checker.isOutOfBounds = true;
+            } else
+            {
+                checker.isOutOfBounds = false;
+            }
+        }
+        /*if (other.GetComponent<PlayerController>())
         {
             gameManager.Player1LeftArea();
         }
@@ -56,6 +68,6 @@ public class OutOfBoundsRegion : MonoBehaviour
             {
                 Destroy(other.gameObject);
             }
-        }
+        }*/
     }
 }

@@ -8,12 +8,14 @@ public class KnockBackObject : MonoBehaviour
 
     public float knockbackMultiplier = 2f;
 
-    public bool responsibleForKnockback = true;
+    public bool thisScriptResponsibleForKnockback = true;
 
     public Vector3 knockBackDirection;
     public float knockbackAmount;
 
     public bool isPlayer;
+
+    public bool isBeingKnockedBack;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,13 +41,22 @@ public class KnockBackObject : MonoBehaviour
                     //If other object is faster
                     knockBackDirection = (rb.transform.position - transform.position).normalized;
                     knockbackAmount = rb.velocity.magnitude * knockbackMultiplier;
-
+                    isBeingKnockedBack = true;
                     rb.velocity = rb.velocity / 2f;
-                    if (responsibleForKnockback)
+
+                } else
+                {
+                    //if this object is faster
+                    isBeingKnockedBack = false;
+                }
+                if (isBeingKnockedBack)
+                {
+                    if (thisScriptResponsibleForKnockback)
                     {
                         Debug.Log(this.transform.name + " knocked Back");
                         KnockBackThis(knockBackDirection, knockbackAmount);
-                    } else
+                    }
+                    else
                     {
                         SendMessage("KnockBack");
                     }
