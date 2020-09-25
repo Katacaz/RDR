@@ -16,8 +16,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Input")]
     public bool useOldInputManager = false;
     public PlayerInput playerInput;
-    private string actionMapGameplay = "Player Controls";
-    private string actionMapMenu = "Menu Controls";
 
     private Vector3 inputDirection;
     private Vector2 movementInput;
@@ -49,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     private float minSpeed = 5.0f;
     public float accelerationMultiplier = 2.0f;
     public float decellerationMultiplier = 4.0f;
+
 
     void Start()
     {

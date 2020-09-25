@@ -49,14 +49,14 @@ public class Cannon : MonoBehaviour
         CheckForTarget();
         SetCannonAppearance();
         timer += Time.deltaTime;
-        if (timer >= fireRate)
+        /*if (timer >= fireRate)
         {
             if (Input.GetButton("Jump"))
             {
                 timer = 0f;
                 FireCannon();
             }
-        }
+        }*/
     }
     void SetCannonAppearance()
     {
@@ -137,5 +137,18 @@ public class Cannon : MonoBehaviour
                 health.TakeDamage(damage);
             }
         }*/
+    }
+
+    public void OnFire()
+    {
+        if (timer >= fireRate)
+        {
+            timer = 0f;
+            FireCannon();
+        }
+    }
+    public void OnAim()
+    {
+        Debug.Log("Aiming Cannon");
     }
 }

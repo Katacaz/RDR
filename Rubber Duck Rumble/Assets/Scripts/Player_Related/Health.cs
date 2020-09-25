@@ -61,6 +61,10 @@ public class Health : MonoBehaviour
             RespawnManager spawnManager = FindObjectOfType<RespawnManager>();
             if (spawnManager.canRespawn)
             {
+                if (GetComponent<PlayerController>())
+                {
+                    GetComponent<PlayerController>().StopKnockBack();
+                }
                 spawnManager.RespawnCharacter(this.gameObject);
             }
         }

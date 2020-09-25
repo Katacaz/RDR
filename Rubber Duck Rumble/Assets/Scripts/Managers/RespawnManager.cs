@@ -14,10 +14,14 @@ public class RespawnManager : MonoBehaviour
 
     public float respawnTime = 2.0f;
 
+    CharacterManager charManager;
+
+    public float respawnSafeDistance = 5.0f;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        charManager = FindObjectOfType<CharacterManager>();
     }
 
     // Update is called once per frame
@@ -27,7 +31,7 @@ public class RespawnManager : MonoBehaviour
     }
     public void SetStockLives()
     {
-        CharacterManager charManager = FindObjectOfType<CharacterManager>();
+        
         foreach (CharacterInfo c in charManager.characters)
         {
             c.info.lives = lives;
@@ -52,13 +56,38 @@ public class RespawnManager : MonoBehaviour
         }
         if (willRespawn)
         {
+            bool validSpawn = false;
             if (respawnLocations.Length > 0)
             {
+                 
                 int location = Random.Range(0, respawnLocations.Length);
 
-                character.transform.position = respawnLocations[location].position;
+                validSpawn = respawnLocations[location].GetComponent<RespawnPointChecker>().safeSpawn;
 
-                StartCoroutine(respawnWait(character));
+                if (!validSpawn)
+                {
+                    Debug.Log(respawnLocations[location].name + " is not a safe respawn point");
+                    RespawnCharacter(character);
+
+                } else
+                {
+                    if (respawnLocations[location].GetComponent<RespawnPointChecker>().usedSpawn == false)
+                    {
+                        //if respawn location has not spawned anything recently
+                        character.transform.position = respawnLocations[location].position;
+                        respawnLocations[location].GetComponent<RespawnPointChecker>().usedSpawn = true;
+                        StartCoroutine(respawnWait(character));
+
+                    } else
+                    {
+                        Debug.Log(respawnLocations[location].name + " was recently used");
+                        RespawnCharacter(character);
+                    }
+
+                }
+
+
+
             }
         } else
         {

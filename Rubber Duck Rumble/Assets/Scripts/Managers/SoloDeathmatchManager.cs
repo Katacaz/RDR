@@ -56,6 +56,7 @@ public class SoloDeathmatchManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        startTimerActive = true;
         StartCoroutine(startDelay());
     }
 
@@ -69,6 +70,7 @@ public class SoloDeathmatchManager : MonoBehaviour
         startTimerCountdown.text = "GO!";
         yield return new WaitForSecondsRealtime(0.5f);
         startTimerCountdown.gameObject.SetActive(false);
+        startTimerActive = false;
         StartRound();
     }
 

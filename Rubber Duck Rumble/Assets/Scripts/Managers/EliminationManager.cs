@@ -30,7 +30,7 @@ public class EliminationManager : MonoBehaviour
             {
                 
                 c.info.eliminations++;
-                Debug.Log(name + " earned an elimination! Total: " + c.info.eliminations.ToString());
+                //Debug.Log(name + " earned an elimination! Total: " + c.info.eliminations.ToString());
             }
         }
     }
