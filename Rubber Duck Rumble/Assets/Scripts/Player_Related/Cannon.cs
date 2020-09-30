@@ -38,7 +38,22 @@ public class Cannon : MonoBehaviour
     public LayerMask raycastLayers;
     public TextMeshProUGUI healthNumberText;
 
+    [Header("Aiming")]
+    public GameObject mainCamera;
+    public GameObject aimCamera;
+    public bool isAiming;
+    public Camera playerCamera;
+    public float aimDistance = 50;
+
+    [Header("Extra: Quack & Squeak")]
+    public AudioClip quackSND;
+    public AudioClip squeakSND;
+    public float randomPitchMin;
+    public float randomPitchMax;
+
     CharacterInfo info;
+
+    bool fireButtonHeld;
     private void Awake()
     {
         info = GetComponent<CharacterInfo>();
@@ -46,17 +61,38 @@ public class Cannon : MonoBehaviour
 
     void Update()
     {
+        AimCannons();
         CheckForTarget();
         SetCannonAppearance();
         timer += Time.deltaTime;
-        /*if (timer >= fireRate)
+
+
+        if (timer >= fireRate)
         {
-            if (Input.GetButton("Jump"))
+            if (fireButtonHeld)
             {
                 timer = 0f;
                 FireCannon();
             }
-        }*/
+        }
+
+        if (isAiming)
+        {
+            mainCamera.SetActive(false);
+            aimCamera.SetActive(true);
+        } else
+        {
+            mainCamera.SetActive(true);
+            aimCamera.SetActive(false);
+        }
+    }
+
+    public void AimCannons()
+    {
+        Vector3 aimSpot = playerCamera.transform.position;
+        aimSpot += playerCamera.transform.forward * aimDistance;
+        leftCannon.transform.LookAt(aimSpot);
+        rightCannon.transform.LookAt(aimSpot);
     }
     void SetCannonAppearance()
     {
@@ -73,7 +109,7 @@ public class Cannon : MonoBehaviour
         Ray ray = new Ray(cannonFirePointRight.position, cannonFirePointRight.forward);
         RaycastHit hitInfo;
 
-        if (Physics.Raycast(ray, out hitInfo, 100, raycastLayers))
+        if (Physics.Raycast(ray, out hitInfo, 200, raycastLayers))
         {
             //Debug.Log("Raycast hit: " + hitInfo.collider.name);
             var health = hitInfo.collider.GetComponent<Health>();
@@ -109,6 +145,7 @@ public class Cannon : MonoBehaviour
         cannonball.transform.rotation = cannonFirePointRight.rotation;
         cannonball.GetComponent<CannonBall>().damage = damage;
         cannonball.GetComponent<CannonBall>().characterName = info.info.characterName;
+        cannonball.GetComponent<CannonBall>().moveSpeed += GetComponent<PlayerController>().moveSpeed;
         audioSource.PlayOneShot(shootSND);
 
         if (dualCannons)
@@ -123,6 +160,8 @@ public class Cannon : MonoBehaviour
             cannonball2.transform.position = cannonFirePointLeft.position;
             cannonball2.transform.rotation = cannonFirePointLeft.rotation;
             cannonball2.GetComponent<CannonBall>().damage = damage;
+            cannonball2.GetComponent<CannonBall>().characterName = info.info.characterName;
+            cannonball2.GetComponent<CannonBall>().moveSpeed += GetComponent<PlayerController>().moveSpeed;
             audioSource.PlayOneShot(shootSND);
         }
         //Ray ray = new Ray(cannonFirePointRight.position, cannonFirePointRight.forward);
@@ -141,14 +180,42 @@ public class Cannon : MonoBehaviour
 
     public void OnFire()
     {
-        if (timer >= fireRate)
+        fireButtonHeld = !fireButtonHeld;
+        /*if (timer >= fireRate)
         {
             timer = 0f;
             FireCannon();
-        }
+        }*/
     }
     public void OnAim()
     {
-        Debug.Log("Aiming Cannon");
+        isAiming = !isAiming;
+    }
+
+    public void OnQuack()
+    {
+        PlaySoundWithRandomPitch(quackSND);
+    }
+    public void OnSqueak()
+    {
+        PlaySoundWithRandomPitch(squeakSND);
+    }
+    public void PlaySoundWithRandomPitch(AudioClip clip)
+    {
+        float basePitch = audioSource.pitch;
+        float randomPitch = UnityEngine.Random.Range(randomPitchMin, randomPitchMax);
+        audioSource.pitch = randomPitch;
+        audioSource.PlayOneShot(clip);
+        audioSource.pitch = basePitch;
+    }
+
+    public void OnDeath()
+    {
+        isAiming = false;
+    }
+    private void OnEnable()
+    {
+        isAiming = false;
+        fireButtonHeld = false;
     }
 }

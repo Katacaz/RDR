@@ -17,6 +17,10 @@ public class CharacterManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        UpdateCharacterNames();
+    }
+    public void UpdateCharacterNames()
+    {
         characterNames = new string[characters.Length];
         for (int i = 0; i < characters.Length; i++)
         {

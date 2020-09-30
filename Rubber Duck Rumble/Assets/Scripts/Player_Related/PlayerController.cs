@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -32,8 +33,13 @@ public class PlayerController : MonoBehaviour
     [Header("Boost Related")]
     public float boostAmount = 10f;
     public bool canBoost;
+    public bool isBoosting;
     public float boostTimer;
     float boostCounter;
+    public GameObject boostParticles;
+    public GameObject boostImage;
+    public Image boostBar;
+
 
     public bool isGrounded;
 
@@ -41,7 +47,9 @@ public class PlayerController : MonoBehaviour
     public float gravity = 9.8f;
     public float jumpSpeed = 8;
     bool isJumping;
-    
+
+    public GameObject leftCannon;
+    public GameObject rightCannon;
     void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -94,11 +102,18 @@ public class PlayerController : MonoBehaviour
             moveSpeedToUse = v > 0 ? moveSpeed : backwardMoveSpeed;
             //controller.SimpleMove(transform.forward * moveSpeedToUse * v);
         }
-        controller.Move(moveDirection * moveSpeed * Time.deltaTime);
+        if (isBoosting)
+        {
+            moveSpeedToUse = boostAmount;
+            moveDirection = transform.forward + transform.up * moveDirection.y + transform.right * h;
+        }
+        controller.Move(moveDirection * moveSpeedToUse * Time.deltaTime);
 
         followTransform.transform.rotation *= Quaternion.AngleAxis(lookH * cameraRotatePower, Vector3.up);
 
         followTransform.transform.rotation *= Quaternion.AngleAxis(lookV * cameraRotatePower, Vector3.right);
+        leftCannon.transform.rotation *= Quaternion.AngleAxis(lookV * cameraRotatePower, Vector3.right);
+        rightCannon.transform.rotation *= Quaternion.AngleAxis(lookV * cameraRotatePower, Vector3.right);
 
         var angles = followTransform.transform.localEulerAngles;
         angles.z = 0;
@@ -112,6 +127,31 @@ public class PlayerController : MonoBehaviour
             angles.x = 40;
         }
 
+        /*var lCannonAngles = leftCannon.transform.localEulerAngles;
+        lCannonAngles.z = 0;
+        var lCannonAngle = leftCannon.transform.localEulerAngles.x;
+        if (lCannonAngle > 180 && lCannonAngle < 340)
+        {
+            lCannonAngles.x = 340;
+        }
+        else if (lCannonAngle < 180 && lCannonAngle > 40)
+        {
+            lCannonAngles.x = 40;
+        }
+        var rCannonAngles = rightCannon.transform.localEulerAngles;
+        rCannonAngles.z = 0;
+        var rCannonAngle = rightCannon.transform.localEulerAngles.x;
+        if (rCannonAngle > 180 && rCannonAngle < 270)
+        {
+            rCannonAngles.x = 270;
+            //rCannonAngles.x = 340;
+        }
+        else if (rCannonAngle < 180 && rCannonAngle > 90)
+        {
+            rCannonAngles.x = 90;
+            //rCannonAngles.x = 40;
+        }*/
+
         followTransform.transform.localEulerAngles = angles;
 
         transform.rotation = Quaternion.Euler(0f, followTransform.transform.rotation.eulerAngles.y, 0f);
@@ -120,12 +160,17 @@ public class PlayerController : MonoBehaviour
         if (boostCounter <= 0)
         {
             canBoost = true;
+            isBoosting = false;
 
         } else
         {
+            boostBar.fillAmount = (boostCounter / boostTimer);
             canBoost = false;
+            isBoosting = true;
             boostCounter -= Time.deltaTime;
         }
+        boostParticles.SetActive(isBoosting);
+        boostImage.SetActive(isBoosting);
 
         /*controller.SimpleMove(moveDirection * Time.deltaTime * moveSpeed);
 
@@ -192,5 +237,18 @@ public class PlayerController : MonoBehaviour
     public void StopKnockBack()
     {
         knockBackCounter = 0;
+        moveDirection = Vector3.zero;
+    }
+
+    public void OnScoreboard()
+    {
+        FindObjectOfType<ScoreManager>().OnScoreboard();
+    }
+
+    public void OnDeath()
+    {
+        knockBackCounter = 0;
+        moveDirection = Vector3.zero;
+        boostCounter = 0;
     }
 }

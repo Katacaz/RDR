@@ -10,8 +10,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Animation")]
     public Animator playerAnimator;
-    private int playerMovementID;
-    private int playerAttackID;
 
     [Header("Input")]
     public bool useOldInputManager = false;
@@ -160,7 +158,7 @@ public class PlayerMovement : MonoBehaviour
 
     void ConvertDirectionFromRawToSmooth()
     {
-        if (currentInput == true)
+        if (currentInput == true || isBoosting)
         {
             smoothDirection = Vector3.Lerp(smoothDirection, rawDirection, Time.deltaTime * smootingSpeed);
         } else if (currentInput == false)
@@ -170,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void MoveThePlayer()
     {
-        if (currentInput == true)
+        if (currentInput == true || isBoosting)
         {
             movement.Set(smoothDirection.x, 0f, smoothDirection.z);
             movement = movement.normalized * movementSpeed * Time.deltaTime;

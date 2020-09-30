@@ -17,6 +17,7 @@ public class CannonBall : MonoBehaviour
 
     [Header("Owner Info")]
     public string characterName;
+    public int characterTeamID;
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +45,12 @@ public class CannonBall : MonoBehaviour
 
         
         
+    }
+
+    public void SetOwnerInfo(string ownerName, int ownerTeamID)
+    {
+        characterName = ownerName;
+        characterTeamID = ownerTeamID;
     }
     private void FixedUpdate()
     {

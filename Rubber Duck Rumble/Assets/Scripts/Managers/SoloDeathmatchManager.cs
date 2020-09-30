@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class SoloDeathmatchManager : MonoBehaviour
 {
+
     [Header("Timer")]
     public bool timerStarted;
     public float roundTimer;
@@ -20,6 +21,8 @@ public class SoloDeathmatchManager : MonoBehaviour
     CharacterManager characterManager;
     RespawnManager respawnManager;
     EliminationManager eliminationManager;
+    TeamManager teamManager;
+    GameModeSettingsManager gameModeSettingsManager;
 
     public CharacterInfo mainPlayerInfo;
 
@@ -33,6 +36,10 @@ public class SoloDeathmatchManager : MonoBehaviour
     public GameObject gameEndScreen;
     public TextMeshProUGUI winnerNameText;
     public TextMeshProUGUI winnerElimsText;
+    public TextMeshProUGUI secondNameText;
+    public TextMeshProUGUI secondScoreText;
+    public TextMeshProUGUI thirdNameText;
+    public TextMeshProUGUI thirdScoreText;
 
     int highestScore = 0;
     string highestScoreName;
@@ -51,6 +58,8 @@ public class SoloDeathmatchManager : MonoBehaviour
         characterManager = GetComponent<CharacterManager>();
         respawnManager = GetComponent<RespawnManager>();
         eliminationManager = GetComponent<EliminationManager>();
+        teamManager = GetComponent<TeamManager>();
+        gameModeSettingsManager = GetComponent<GameModeSettingsManager>();
     }
 
     // Start is called before the first frame update
@@ -58,6 +67,8 @@ public class SoloDeathmatchManager : MonoBehaviour
     {
         startTimerActive = true;
         StartCoroutine(startDelay());
+        teamManager.charManager = characterManager;
+        teamManager.SeperateTeams();
     }
 
     IEnumerator startDelay()
@@ -125,52 +136,36 @@ public class SoloDeathmatchManager : MonoBehaviour
         FindWinner();
         winnerNameText.text = highestScoreName;
         winnerElimsText.text = highestScore.ToString();
+        secondNameText.text = secondScoreName;
+        secondScoreText.text = secondScore.ToString();
+        thirdNameText.text = thirdScoreName;
+        thirdScoreText.text = thirdScore.ToString();
         gameEndScreen.SetActive(true);
     }
 
     public void FindWinner()
     {
-        int loops = 0;
-        bool sorting = true;
+
+        ScoreManager scoreManager = FindObjectOfType<ScoreManager>();
+        ScoreInfo firstInfo = ScriptableObject.CreateInstance(typeof(ScoreInfo)) as ScoreInfo;
+        firstInfo = scoreManager.FindScore(0);
+        ScoreInfo secondInfo = ScriptableObject.CreateInstance(typeof(ScoreInfo)) as ScoreInfo;
+        secondInfo = scoreManager.FindScore(1);
+        ScoreInfo thirdInfo = ScriptableObject.CreateInstance(typeof(ScoreInfo)) as ScoreInfo;
+        thirdInfo = scoreManager.FindScore(2);
+
+        highestScore = firstInfo.score;
+        highestScoreName = firstInfo.username;
+
+        secondScore = secondInfo.score;
+        secondScoreName = secondInfo.username;
+
+        thirdScore = thirdInfo.score;
+        thirdScoreName = thirdInfo.username;
 
         
-        while (sorting)
-        {
-            loops++;
-            bool newWinner = false;
-            
-            foreach (CharacterInfo c in characterManager.characters)
-            {
-                if (c.info.eliminations >= highestScore)
-                {
-                    highestScore = c.info.eliminations;
-                    highestScoreName = c.info.characterName;
-                    newWinner = true;
-                    
-                } else if (c.info.eliminations >= secondScore)
-                {
-                    secondScore = c.info.eliminations;
-                    secondScoreName = c.info.characterName;
-                    newWinner = true;
-                    
-                } else if (c.info.eliminations >= thirdScore)
-                {
-                    thirdScore = c.info.eliminations;
-                    thirdScoreName = c.info.characterName;
-                    newWinner = true;
-                    
-                }
-            }
-            //Debug.Log("Loops: " + loops.ToString());
-            if (newWinner)
-            {
-                sorting = false;
-            }
-        }
-        Debug.Log("Total Loops: " + loops.ToString());
 
-        
-        
+
     }
     public void BackToMenu()
     {

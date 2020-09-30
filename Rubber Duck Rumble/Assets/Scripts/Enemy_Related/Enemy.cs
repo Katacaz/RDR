@@ -15,6 +15,8 @@ public class Enemy : MonoBehaviour
     public Transform leftCannonFirePoint;
     public Transform rightCannonFirePoint;
 
+    public bool usingDualCannons;
+
     public GameObject leftCannon;
     public GameObject rightCannon;
 
@@ -51,6 +53,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SetCannonAppearance();
         if (healthTarget != null)
         {
             attackTimer += Time.deltaTime;
@@ -59,6 +62,17 @@ public class Enemy : MonoBehaviour
             {
                 Attack();
             }
+        }
+    }
+
+    public void SetCannonAppearance()
+    {
+        if (usingDualCannons)
+        {
+            rightCannon.SetActive(true);
+        } else
+        {
+            rightCannon.SetActive(false);
         }
     }
 
@@ -82,18 +96,20 @@ public class Enemy : MonoBehaviour
         leftCannonBall.GetComponent<CannonBall>().characterName = this.GetComponent<CharacterInfo>().info.characterName;
         audioSource.PlayOneShot(cannonFireSND);
         //leftCannon.transform.rotation = leftCannonBaseRotation;
-
-        //Quaternion rightCannonBaseRotation = rightCannon.transform.rotation;
-        //rightCannon.transform.LookAt(healthTarget.transform);
-        InstantiateAtPosition(cannonFireEffectPrefab, rightCannonFirePoint, 2.0f);
-        GameObject rightCannonBall = Instantiate(cannonBallPrefab);
-        Physics.IgnoreCollision(rightCannonBall.GetComponent<Collider>(), this.GetComponent<Collider>(), true);
-        Physics.IgnoreCollision(rightCannonBall.GetComponent<Collider>(), leftCannonBall.GetComponent<Collider>(), true);
-        rightCannonBall.transform.position = rightCannonFirePoint.transform.position;
-        rightCannonBall.transform.rotation = rightCannonFirePoint.transform.rotation;
-        rightCannonBall.GetComponent<CannonBall>().damage = damageAmount;
-        rightCannonBall.GetComponent<CannonBall>().characterName = this.GetComponent<CharacterInfo>().info.characterName;
-        //rightCannon.transform.rotation = rightCannonBaseRotation;
+        if (usingDualCannons)
+        {
+            //Quaternion rightCannonBaseRotation = rightCannon.transform.rotation;
+            //rightCannon.transform.LookAt(healthTarget.transform);
+            InstantiateAtPosition(cannonFireEffectPrefab, rightCannonFirePoint, 2.0f);
+            GameObject rightCannonBall = Instantiate(cannonBallPrefab);
+            Physics.IgnoreCollision(rightCannonBall.GetComponent<Collider>(), this.GetComponent<Collider>(), true);
+            Physics.IgnoreCollision(rightCannonBall.GetComponent<Collider>(), leftCannonBall.GetComponent<Collider>(), true);
+            rightCannonBall.transform.position = rightCannonFirePoint.transform.position;
+            rightCannonBall.transform.rotation = rightCannonFirePoint.transform.rotation;
+            rightCannonBall.GetComponent<CannonBall>().damage = damageAmount;
+            rightCannonBall.GetComponent<CannonBall>().characterName = this.GetComponent<CharacterInfo>().info.characterName;
+            //rightCannon.transform.rotation = rightCannonBaseRotation;
+        }
 
 
 

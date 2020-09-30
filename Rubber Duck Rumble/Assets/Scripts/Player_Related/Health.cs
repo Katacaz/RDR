@@ -34,13 +34,16 @@ public class Health : MonoBehaviour
     }
     public void CallKnockBack(Vector3 direction)
     {
-        if (GetComponent<ObjectKnockBack>() != null)
+        if (currentHealth > 1)
         {
-            GetComponent<ObjectKnockBack>().KnockBack(direction);
-        }
-        if (GetComponent<PlayerController>())
-        {
-            GetComponent<PlayerController>().KnockBack(direction);
+            if (GetComponent<ObjectKnockBack>() != null)
+            {
+                GetComponent<ObjectKnockBack>().KnockBack(direction);
+            }
+            if (GetComponent<PlayerController>())
+            {
+                GetComponent<PlayerController>().KnockBack(direction);
+            }
         }
     }
     private void Death(string name)
@@ -57,6 +60,7 @@ public class Health : MonoBehaviour
             if (elimManager != null)
             {
                 elimManager.RewardElimination(name);
+                elimManager.IncreastDeathCounter(this.GetComponent<CharacterInfo>().info.characterName);
             }
             RespawnManager spawnManager = FindObjectOfType<RespawnManager>();
             if (spawnManager.canRespawn)
@@ -64,6 +68,7 @@ public class Health : MonoBehaviour
                 if (GetComponent<PlayerController>())
                 {
                     GetComponent<PlayerController>().StopKnockBack();
+                    SendMessage("OnDeath");
                 }
                 spawnManager.RespawnCharacter(this.gameObject);
             }

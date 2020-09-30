@@ -6,10 +6,14 @@ public class EliminationManager : MonoBehaviour
 {
 
     CharacterManager charManager;
+    ScoreManager scoreManager;
+
+    public int elimScorePoints = 10;
 
     private void Awake()
     {
         charManager = GetComponent<CharacterManager>();
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
     // Start is called before the first frame update
     void Start()
@@ -30,7 +34,20 @@ public class EliminationManager : MonoBehaviour
             {
                 
                 c.info.eliminations++;
+                scoreManager.AddElimScore(name, elimScorePoints);
+
                 //Debug.Log(name + " earned an elimination! Total: " + c.info.eliminations.ToString());
+            }
+        }
+    }
+    public void IncreastDeathCounter(string name)
+    {
+        foreach (CharacterInfo c in charManager.characters)
+        {
+            if (c.info.characterName == name)
+            {
+
+                c.info.deaths++;
             }
         }
     }

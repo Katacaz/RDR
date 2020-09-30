@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class RespawnManager : MonoBehaviour
 {
@@ -39,6 +40,10 @@ public class RespawnManager : MonoBehaviour
     }
     public void RespawnCharacter(GameObject character)
     {
+        if (character.GetComponent<PlayerController>())
+        {
+            character.GetComponent<PlayerController>().StopKnockBack();
+        }
         bool willRespawn = true;
         if (isStock)
         {
@@ -66,7 +71,7 @@ public class RespawnManager : MonoBehaviour
 
                 if (!validSpawn)
                 {
-                    Debug.Log(respawnLocations[location].name + " is not a safe respawn point");
+                    //Debug.Log(respawnLocations[location].name + " is not a safe respawn point");
                     RespawnCharacter(character);
 
                 } else
@@ -74,13 +79,22 @@ public class RespawnManager : MonoBehaviour
                     if (respawnLocations[location].GetComponent<RespawnPointChecker>().usedSpawn == false)
                     {
                         //if respawn location has not spawned anything recently
-                        character.transform.position = respawnLocations[location].position;
+                        if (character.GetComponent<NavMeshAgent>() != null)
+                        {
+                            // if the respawning character is an AI
+                            character.GetComponent<NavMeshAgent>().Warp(respawnLocations[location].position);
+                        }
+                        else
+                        {
+                            
+                            character.transform.position = respawnLocations[location].position;
+                        }
                         respawnLocations[location].GetComponent<RespawnPointChecker>().usedSpawn = true;
                         StartCoroutine(respawnWait(character));
 
                     } else
                     {
-                        Debug.Log(respawnLocations[location].name + " was recently used");
+                        //Debug.Log(respawnLocations[location].name + " was recently used");
                         RespawnCharacter(character);
                     }
 
@@ -91,6 +105,7 @@ public class RespawnManager : MonoBehaviour
             }
         } else
         {
+            
             character.SetActive(false);
             //Debug.Log(character.GetComponent<CharacterInfo>().info.characterName + " has been eliminated.");
         }

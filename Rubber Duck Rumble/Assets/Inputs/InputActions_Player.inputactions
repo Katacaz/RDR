@@ -52,6 +52,30 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "Quack",
+                    "type": "Button",
+                    "id": "dceac90b-e819-4821-9510-f4242c081028",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Squeak",
+                    "type": "Button",
+                    "id": "07ae9aa5-fc02-4981-8928-812b96ee3c51",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Scoreboard",
+                    "type": "Button",
+                    "id": "1347431d-f1a1-4ef2-9afe-dcccf63c5cae",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -147,7 +171,7 @@
                     "name": "",
                     "id": "85f9f9df-1f4f-411b-b869-8b99c967c951",
                     "path": "<Gamepad>/rightTrigger",
-                    "interactions": "Press",
+                    "interactions": "Press(behavior=2)",
                     "processors": "",
                     "groups": "Gamepads",
                     "action": "Fire",
@@ -256,8 +280,8 @@
                 {
                     "name": "",
                     "id": "00de4b16-3048-4b23-bc77-cc024334fad1",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "Press(behavior=2)",
                     "processors": "",
                     "groups": "Gamepads",
                     "action": "Aim",
@@ -272,6 +296,96 @@
                     "processors": "",
                     "groups": "",
                     "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "03927df5-0b04-40d7-bc4c-a8379bc12bb2",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepads",
+                    "action": "Quack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b471c130-d64a-4af7-8a43-9b3b9d7f133d",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepads",
+                    "action": "Squeak",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a3d95e9a-aa1d-4f7b-b89f-df6a9b91933d",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "11571e84-5693-4bbc-b37f-331d2bc108ef",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepads",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Menu Controls",
+            "id": "d7b4f420-559d-40ba-abbd-a3eb90c8d511",
+            "actions": [
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "b00b6fed-ffa7-4c66-9acb-de9bff8b1a16",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Back",
+                    "type": "Button",
+                    "id": "b349a1bf-e084-410e-bcce-f94c4a2d2f6a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f0cbd654-d026-43b5-8c9d-920b631fee6c",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bc5ed0a5-4276-44e6-aabc-7a51adc00ba9",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
